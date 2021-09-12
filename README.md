@@ -13,6 +13,68 @@ This application provides a friendly user interface that allows the user to mana
 1. User can change the font and font size of the entire application
 1. Admin users can add and remove accounts. (login required)
 
-#### Screenshots
+
+#### Screenshots:
 Login Dialog:
-![Login Dialog](https://github.com/Fjdklsajf/Transaction-Tracker/tree/main/Screenshots/login.png?raw=true)
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/login.png" width="500">
+
+
+Add new Category:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/addCat.png" width="500">
+
+
+Add new Transaction:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/addTrans.png" width="500">
+
+
+Sort by Category:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/sortCat.png" width="500">
+
+
+Sort by Date:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/sortDate.png" width="500">
+
+
+Sort by Amount:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/sortAmount.png" width="500">
+
+
+Applied Filters:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/filters.png" width="500">
+
+
+Print Transactions:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/print.png" width="500">
+
+
+Third Tab:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/moreTab.png" width="500">
+
+
+Export files:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/export.png" width="500">
+
+
+Manage User Accounts:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/users.png" width="500">
+
+
+Changing Font:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/font.png" width="500">
+
+
+Full Screen:
+
+<img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/fullScreen.png" width="500">
