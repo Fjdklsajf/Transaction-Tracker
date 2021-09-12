@@ -15,4 +15,4 @@ This application provides a friendly user interface that allows the user to mana
 
 #### Screenshots
 Login Dialog:
-![Login Dialog](https://github.com/Fjdklsajf/Transaction-Tracker/blob/master/Screenshots/login.png?raw=true)
+![Login Dialog](https://github.com/Fjdklsajf/Transaction-Tracker/tree/main/Screenshots/login.png?raw=true)
