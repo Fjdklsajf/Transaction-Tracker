@@ -14,7 +14,7 @@ This application provides a friendly user interface that allows the user to mana
 1. Admin users can add and remove accounts. (login required)
 
 
-#### Screenshots: (updated program screenshots at the end)
+#### Screenshots: (updated program screenshots on the bottom)
 Login Dialog:
 
 <img src="https://github.com/Fjdklsajf/Transaction-Tracker/blob/main/Screenshots/login.png" width="500">
