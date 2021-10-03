@@ -48,8 +48,8 @@ TransactionWindow::TransactionWindow(QWidget *parent,
  *    the dialog window is set up with given parameter values
  ******************************************************************************/
 TransactionWindow::TransactionWindow(const std::vector<QString>& categories,
-                                     const QDate& d, double cost,
-                                     QString descrip, QWidget *parent) :
+                                     const QDate& d, double cost, QString descrip,
+                                     QString checkNum, QWidget *parent) :
     QDialog(parent), ui(new Ui::TransactionWindow) {
 
     // set up the dialog
@@ -57,6 +57,7 @@ TransactionWindow::TransactionWindow(const std::vector<QString>& categories,
     ui->date->setDate(d);
     ui->amount->setText(QString().asprintf("%0.2f", cost));
     ui->description->setText(descrip);
+    ui->checkNum->setText(checkNum);
 
     // add categories to the combo box
     for(QString c : categories) {
@@ -171,6 +172,23 @@ QString TransactionWindow::category() const {
 
 /******************************************************************************
  *
+ *  Accessor checkNum: Class TransactionWindow
+ *_____________________________________________________________________________
+ *  This method will return the category displayed in the combo box
+ *  - returns QString
+ *_____________________________________________________________________________
+ *  PRE-CONDITIONS
+ *    none
+ *
+ *  POST-CONDITIONS
+ *    current item in the combo box is returned
+ ******************************************************************************/
+QString TransactionWindow::checkNum() const {
+    return ui->checkNum->text();
+}
+
+/******************************************************************************
+ *
  *  Mutator setCategory: Class TransactionWindow
  *_____________________________________________________________________________
  *  This method will update category combo box item
@@ -206,14 +224,16 @@ void TransactionWindow::on_saveButton_clicked() {
     _date = ui->date->date();
     _cost = ui->amount->text().toDouble(&valid);
     _description = ui->description->toPlainText();
+    _checkNum = ui->checkNum->text();
 
-    // if amount and date are valid
-    if(valid && _date.isValid()) {
+    // validate amount and date inputs
+    if(!valid) {
+        QMessageBox::critical(this, "Error", "Invalid amount");
+    } else if(!_date.isValid()) {
+        QMessageBox::critical(this, "Error", "Invalid date");
+    } else {
         _save = true;
         this->close();
-    } else { // otherwise display message box
-        QMessageBox::critical(this, "Error",
-                              "Invalid input(s).");
     }
 }
 

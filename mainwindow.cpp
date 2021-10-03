@@ -77,12 +77,13 @@ MainWindow::MainWindow(QWidget *parent, const std::map<QString, QString>& users,
 
     // set up transaction tables
     ui->inTrans_tableWidget->setColumnCount(3);
-    ui->exTrans_tableWidget->setColumnCount(3);
+    ui->exTrans_tableWidget->setColumnCount(4);
     QStringList labels;
     labels << "Category" << "Date" << "Amount";
     ui->inTrans_tableWidget->setHorizontalHeaderLabels(labels);
     ui->inTrans_tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->inTrans_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
+    labels << "Check #";
     ui->exTrans_tableWidget->setHorizontalHeaderLabels(labels);
     ui->exTrans_tableWidget->setEditTriggers(QAbstractItemView::NoEditTriggers);
     ui->exTrans_tableWidget->setSelectionBehavior(QAbstractItemView::SelectRows);
@@ -105,26 +106,45 @@ MainWindow::MainWindow(QWidget *parent, const std::map<QString, QString>& users,
     ui->exStartDate_dateEdit->setDate(QDate::currentDate());
     ui->exEndDate_dateEdit->setDate(QDate::currentDate());
 
-    // set default button and selections
+    // set default button and user preference
     ui->inTransAdd_pushButton->setDefault(true);
-    ui->fontComboBox->setCurrentFont(QFont("Arial"));
-    ui->fontSize_comboBox->setCurrentText("10");
+    QString font = "Arial";
+    QString size = "10";
+    QFile settings = qApp->applicationDirPath() + "/settings.txt";
+    if(settings.open(QIODevice::ReadOnly)) {
+        font = settings.readLine().trimmed();
+        size = settings.readLine().trimmed();
+        settings.close();
+    }
+    ui->fontComboBox->setCurrentFont(QFont(font));
+    ui->fontSize_comboBox->setCurrentText(size);
+
+    QFont f = font;
+    f.setPointSize(size.toInt());
+    QApplication::setFont(f);
 }
 
 /******************************************************************************
  *
  *  Destructor ~MainWindow: Class MainWindow
  *_____________________________________________________________________________
- *  Deletes the ui
+ *  Deletes the ui and saves setting preferences in a file
  *  - returns void
  *_____________________________________________________________________________
  *  PRE-CONDITIONS
  *    none
  *
  *  POST-CONDITIONS
- *    ui is deleted
+ *    ui is deleted and settings file updated
  ******************************************************************************/
 MainWindow::~MainWindow() {
+    QFile settings = qApp->applicationDirPath() + "/settings.txt";
+    if(settings.open(QIODevice::WriteOnly)) {
+        settings.write((ui->fontComboBox->currentText() + "\n").toUtf8());
+        settings.write((ui->fontSize_comboBox->currentText() + "\n").toUtf8());
+        settings.close();
+    }
+
     delete ui;
 }
 
@@ -209,6 +229,7 @@ void MainWindow::readFile(QFile& file, Tracker& tracker) {
             QString timestamp = file.readLine().trimmed();
             QString cost = file.readLine().trimmed();
             QString description = file.readLine().trimmed();
+            QString checkNum = file.readLine().trimmed();
             description.replace("\\\\n", "\n");
 
             QStringList list = date.split("/");
@@ -219,8 +240,7 @@ void MainWindow::readFile(QFile& file, Tracker& tracker) {
             QTime timestampT(list[3].toInt(), list[4].toInt(), list[5].toInt(), list[6].toInt());
             QDateTime t(timestampD, timestampT);
 
-
-            tracker.addTransaction(category, cost.toDouble(), description, d, t);
+            tracker.addTransaction(category, cost.toDouble(), description, d, checkNum, t);
         }
 
         file.close();
@@ -332,6 +352,8 @@ void MainWindow::updateExTrans() {
             _exTrans = _expense.getAllTransactions();
         } else if (_exSorted == SORT_AMOUNT) {
             _exTrans = _expense.getTransAmountSorted();
+        } else if (_exSorted == SORT_CHECK) {
+            _exTrans = _expense.getTransCheckNumSorted();
         } else {
             _exTrans = _expense.getTransDateSorted();
             _exSorted = SORT_DATE;
@@ -339,6 +361,8 @@ void MainWindow::updateExTrans() {
     } else { // selected category
         if(_exSorted == SORT_AMOUNT) {
             _exTrans = _expense.getTransAmount(cat);
+        } else if (_exSorted == SORT_CHECK) {
+            _exTrans = _expense.getTransCheckNumSorted(cat);
         } else {
             _exTrans = _expense.getTransDate(cat);
             _exSorted = SORT_DATE;
@@ -352,6 +376,7 @@ void MainWindow::updateExTrans() {
  *_____________________________________________________________________________
  *  Updates the income Transactions table with filtered Transactions list
  *    Updates the income description text edit with the first item
+ *    Updates the total amount
  *    Each transaction is displayed with the form:
  *      CateogryName mm/dd/yyyy $10.00
  *  - returns void
@@ -402,6 +427,13 @@ void MainWindow::updateInTransTable() {
     } else {
         ui->inDescrip_textEdit->clear();
     }
+
+    // Update total amount text
+    double total = 0;
+    for(const Transaction& t : _inFiltered) {
+        total += t.getCost();
+    }
+    ui->inTotal_lineEdit->setText(QString().asprintf("$%0.2f", total));
 }
 
 /******************************************************************************
@@ -410,6 +442,7 @@ void MainWindow::updateInTransTable() {
  *_____________________________________________________________________________
  *  Updates the expense Transactions table with filtered Transactions list
  *    Updates the expense description text edit with the first item
+ *    Updates the total amount
  *    Each transaction is displayed with the form:
  *      CateogryName mm/dd/yyyy $10.00
  *  - returns void
@@ -443,14 +476,17 @@ void MainWindow::updateExTransTable() {
         QTableWidgetItem *category = new QTableWidgetItem;
         QTableWidgetItem *date = new QTableWidgetItem;
         QTableWidgetItem *cost = new QTableWidgetItem;
+        QTableWidgetItem *checkNum = new QTableWidgetItem;
 
         category->setText(_exFiltered[i].getCategory());
         date->setText(_exFiltered[i].dateShortText());
         cost->setText(_exFiltered[i].costText());
+        checkNum->setText(_exFiltered[i].getCheckNum());
 
         ui->exTrans_tableWidget->setItem(i, 0, category);
         ui->exTrans_tableWidget->setItem(i, 1, date);
         ui->exTrans_tableWidget->setItem(i, 2, cost);
+        ui->exTrans_tableWidget->setItem(i, 3, checkNum);
     }
 
     // set up description
@@ -460,6 +496,13 @@ void MainWindow::updateExTransTable() {
     } else {
         ui->exDescrip_textEdit->clear();
     }
+
+    // Update total amount text
+    double total = 0;
+    for(const Transaction& t : _exFiltered) {
+        total += t.getCost();
+    }
+    ui->exTotal_lineEdit->setText(QString().asprintf("$%0.2f", total));
 }
 
 /******************************************************************************
@@ -769,7 +812,8 @@ void MainWindow::on_inTransAdd_pushButton_clicked() {
         // add new Transaction
         QString category = transWindow->category();
         _income.addTransaction(category, transWindow->cost(),
-                               transWindow->description(), transWindow->date());
+                               transWindow->description(), transWindow->date(),
+                               transWindow->checkNum());
 
         // Update display
         updateInTrans();
@@ -855,8 +899,9 @@ void MainWindow::on_inTransEdit_pushButton_clicked() {
     QString category = t.getCategory();
 
     // set up and display TransactionWindow dialog
-    transWindow = new TransactionWindow(_income.getCategoryNames(), _inTrans[i].getDate(),
-                                        _inTrans[i].getCost(), _inTrans[i].getDescription(), this);
+    transWindow = new TransactionWindow(_income.getCategoryNames(), t.getDate(),
+                                        t.getCost(), t.getDescription(),
+                                        t.getCheckNum(), this);
     transWindow->setCategory(category);
     transWindow->exec();
 
@@ -866,7 +911,8 @@ void MainWindow::on_inTransEdit_pushButton_clicked() {
         QString newCat = transWindow->category();
         _income.removeTransaction(category, t);
         _income.addTransaction(newCat, transWindow->cost(),
-                               transWindow->description(), transWindow->date());
+                               transWindow->description(), transWindow->date(),
+                               transWindow->checkNum());
 
         // update display
         updateInTrans();
@@ -1052,11 +1098,16 @@ void MainWindow::on_inReport_pushButton_clicked() {
         }
         html += _inFiltered[i].dateShortText() + " -- " + _inFiltered[i].costText() + "<br>";
 
+        QString checkNum = _inFiltered[i].getCheckNum();
+        if(checkNum != "") {
+            html += "Check #: " + checkNum + "<br>";
+        }
+
         QString description = _inFiltered[i].getDescription();
         if(description != "") {
             description = description.trimmed();
             description.replace("\n", "<br>");
-            html += description + "<br>";
+            html += "&nbsp;&nbsp;&nbsp;&nbsp;" + description + "<br>";
         }
 
         if(i != _inFiltered.size()-1) {
@@ -1064,6 +1115,16 @@ void MainWindow::on_inReport_pushButton_clicked() {
         }
     }
     html += "</p>";
+
+    // Add total cost
+    double total = 0;
+    for(const Transaction& t : _inFiltered) {
+        total += t.getCost();
+    }
+    html += "<br>";
+    html += "<div align=left>Total amount: " +
+                QString().asprintf("$%0.2f", total) +
+            "</div>";
 
     // Create and print PDF
     QTextDocument document;
@@ -1303,7 +1364,8 @@ void MainWindow::on_exTransAdd_pushButton_clicked() {
         // add new Transaction
         QString category = transWindow->category();
         _expense.addTransaction(category, transWindow->cost(),
-                               transWindow->description(), transWindow->date());
+                               transWindow->description(), transWindow->date(),
+                               transWindow->checkNum());
 
         // Update display
         updateExTrans();
@@ -1389,8 +1451,9 @@ void MainWindow::on_exTransEdit_pushButton_clicked() {
     QString category = t.getCategory();
 
     // set up and display TransactionWindow dialog
-    transWindow = new TransactionWindow(_expense.getCategoryNames(), _exTrans[i].getDate(),
-                                        _exTrans[i].getCost(), _exTrans[i].getDescription(), this);
+    transWindow = new TransactionWindow(_expense.getCategoryNames(), t.getDate(),
+                                        t.getCost(), t.getDescription(),
+                                        t.getCheckNum(), this);
     transWindow->setCategory(category);
     transWindow->exec();
 
@@ -1399,8 +1462,9 @@ void MainWindow::on_exTransEdit_pushButton_clicked() {
         // modify selected Transaction
         QString newCat = transWindow->category();
         _expense.removeTransaction(category, t);
-        _expense.addTransaction(transWindow->category(), transWindow->cost(),
-                               transWindow->description(), transWindow->date());
+        _expense.addTransaction(newCat, transWindow->cost(),
+                                transWindow->description(), transWindow->date(),
+                                transWindow->checkNum());
 
         // update display
         updateExTrans();
@@ -1583,13 +1647,19 @@ void MainWindow::on_exReport_pushButton_clicked() {
         if(cat == ALL_TRANS) {
             html += _exFiltered[i].getCategory() + "<br>";
         }
-        html += _exFiltered[i].dateShortText() + " -- " + _exFiltered[i].costText() + "<br>";
+        html += _exFiltered[i].dateShortText() + " -- " +
+                _exFiltered[i].costText() + "<br>";
+
+        QString checkNum = _exFiltered[i].getCheckNum();
+        if(checkNum != "") {
+            html += "Check #: " + checkNum + "<br>";
+        }
 
         QString description = _exFiltered[i].getDescription();
         if(description != "") {
             description = description.trimmed();
             description.replace("\n", "<br>");
-            html += description + "<br>";
+            html += "&nbsp;&nbsp;&nbsp;&nbsp;" + description + "<br>";
         }
 
         if(i != _exFiltered.size()-1) {
@@ -1597,6 +1667,16 @@ void MainWindow::on_exReport_pushButton_clicked() {
         }
     }
     html += "</p>";
+
+    // Add total cost
+    double total = 0;
+    for(const Transaction& t : _exFiltered) {
+        total += t.getCost();
+    }
+    html += "<br>";
+    html += "<div align=left>Total amount: " +
+                QString().asprintf("$%0.2f", total) +
+            "</div>";
 
     // Create and print PDF
     QTextDocument document;

@@ -27,6 +27,7 @@ class Tracker {
     std::vector<Transaction> getAllTransactions();
     std::vector<Transaction> getTransDateSorted();
     std::vector<Transaction> getTransAmountSorted();
+    std::vector<Transaction> getTransCheckNumSorted(QString category = "");
 
     /**************
      ** MUTATORS **
@@ -40,6 +41,7 @@ class Tracker {
     void addTransaction(QString category, const Transaction& t);
     void addTransaction(QString category, double cost, QString description = "",
                         const QDate& date = QDate::currentDate(),
+                        QString checkNum = "",
                         const QDateTime& time = QDateTime::currentDateTime());
     void removeTransaction(QString category, const Transaction& t);
 
@@ -181,6 +183,17 @@ class Tracker {
  *    Return: std::vector<Transaction>
  ******************************************************************************/
 
+/******************************************************************************
+ *  std::vector<Transaction> getTransCheckNumSorted(QString category "");
+ *
+ *    Accessor; This method will return all Transactions sorted by check number,
+ *      if no argument is passed, Transactions from all categories are returned
+ * ----------------------------------------------------------------------------
+ *    Parameters: none
+ * ----------------------------------------------------------------------------
+ *    Return: std::vector<Transaction>
+ ******************************************************************************/
+
 
 /**************
  ** MUTATORS **
@@ -260,13 +273,14 @@ class Tracker {
 
 /******************************************************************************
  *  void addTransaction(QString category, double cost, QString description = "",
-                        const QDate& date = QDate::currentDate(),
-                        const QDateTime& time = QDateTime::currentDateTime());
+ *                      const QDate& date = QDate::currentDate(),
+ *                      QString checkNum = "",
+ *                      const QDateTime& time = QDateTime::currentDateTime());
  *
  *    Mutator; This method will add a Transaction with the given info in the
  *      given Category if the category exists
  * ----------------------------------------------------------------------------
- *    Parameters: QString, double, QString, const QDate&, const QDateTime&
+ *    Parameters: QString, double, QString, const QDate&, QString, const QDateTime&
  * ----------------------------------------------------------------------------
  *    Return: void
  ******************************************************************************/

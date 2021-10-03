@@ -103,7 +103,7 @@ class MainWindow : public QMainWindow
 
 private:
     const QString ALL_TRANS = "-- All --";
-    const int SORT_CAT = 0, SORT_DATE = 1, SORT_AMOUNT = 2;
+    const int SORT_CAT = 0, SORT_DATE = 1, SORT_AMOUNT = 2, SORT_CHECK = 3;
 
     Ui::MainWindow *ui;
     TransactionWindow *transWindow;
@@ -112,7 +112,7 @@ private:
     bool _admin;
     std::vector<Transaction> _inTrans, _exTrans;
     std::vector<Transaction> _inFiltered, _exFiltered;
-    // 0 - cat, 1 - date, 2 - amount
+    // 0 - cat, 1 - date, 2 - amount, 3 - check number
     int _inSorted, _exSorted;
     bool _inDateFilter, _exDateFilter;
     bool _inKeyword, _exKeyword;
@@ -144,7 +144,7 @@ private:
 
 /******************************************************************************
  *  ~MainWindow();
- *    Destructor; Deleted the ui
+ *    Destructor; Deletes the ui and saves setting preferences in a file
  *    Parameters: none
  *    Return: void
  ******************************************************************************/

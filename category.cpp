@@ -257,8 +257,9 @@ void Category::add(const Transaction& t) {
  *  POST-CONDITIONS
  *    A transaction is added to both _transDate and _transAmount
  ******************************************************************************/
-void Category::add(double cost, QString description, const QDate& date, const QDateTime& time) {
-    add(Transaction(cost, description, date, time, _category));
+void Category::add(double cost, QString description, const QDate& date,
+                   QString checkNum, const QDateTime& time) {
+    add(Transaction(cost, description, date, time, _category, checkNum));
 }
 
 /******************************************************************************

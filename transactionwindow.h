@@ -17,9 +17,10 @@ class TransactionWindow : public QDialog {
      ** CONSTRUCTOR & DESCTRUCTOR **
      *******************************/
     explicit TransactionWindow(QWidget *parent = nullptr,
-                               const std::vector<QString>& categories = std::vector<QString>());
+             const std::vector<QString>& categories = std::vector<QString>());
     TransactionWindow(const std::vector<QString>& categories, const QDate& d,
-                      double cost, QString descrip, QWidget *parent = nullptr);
+                      double cost, QString descrip, QString checkNum,
+                      QWidget *parent = nullptr);
     ~TransactionWindow();
 
     /***************
@@ -30,6 +31,7 @@ class TransactionWindow : public QDialog {
     QString description() const;
     bool save() const;
     QString category() const;
+    QString checkNum() const;
 
     /**************
      ** MUTATORS **
@@ -48,6 +50,7 @@ private:
     QDate _date;
     double _cost;
     QString _description;
+    QString _checkNum;
     bool _save;
 };
 

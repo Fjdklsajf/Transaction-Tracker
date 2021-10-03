@@ -10,10 +10,10 @@ class Transaction {
      ** CONSTRUCTOR **
      *****************/
     Transaction();
-    Transaction(double cost, QString descrip = "",
+    explicit Transaction(double cost, QString descrip = "",
                 const QDate& date = QDate::currentDate(),
                 const QDateTime& time = QDateTime::currentDateTime(),
-                QString category = "");
+                QString category = "", QString checkNum = "");
 
     /***************
      ** ACCESSORS **
@@ -23,6 +23,7 @@ class Transaction {
     double getCost() const;
     const QDate& getDate() const;
     const QDateTime& getTimestamp() const;
+    QString getCheckNum() const;
 
     /**************
      ** MUTATORS **
@@ -34,6 +35,7 @@ class Transaction {
     void setDate(int year, int month, int day);
     void setTimestamp(const QDateTime& time);
     void setTimestamp(int y, int M, int d, int h, int m, int s, int ms = 0);
+    void setCheckNum(QString checkNum);
 
     /*******************************
      ** CONSTANT MEMBER FUNCTIONS **
@@ -61,13 +63,15 @@ class Transaction {
     QDate _date;
     QDateTime _timestamp;
     QString _category;
+    QString _checkNum;
 };
 
 #endif // TRANSACTION_H
 
 /******************************************************************************
  *  Transaction Class
- *    A transaction containing date, cost, description and added date and time
+ *    A transaction containing date, cost, description, added date and time,
+ *      and check number
  ******************************************************************************/
 
 
@@ -143,6 +147,16 @@ class Transaction {
  *    Parameters: none
  * ----------------------------------------------------------------------------
  *    Return: const QDateTime&
+ ******************************************************************************/
+
+/******************************************************************************
+ *  QString getCheckNum() const;
+ *
+ *    Accessor; This method will return _checkNum
+ * ----------------------------------------------------------------------------
+ *    Parameters: none
+ * ----------------------------------------------------------------------------
+ *    Return: QString
  ******************************************************************************/
 
 
@@ -223,6 +237,17 @@ class Transaction {
  *      year, month, day, hour, minute, second, and millisecond values
  * ----------------------------------------------------------------------------
  *    Parameters: int, int, int, int, int, int, int
+ * ----------------------------------------------------------------------------
+ *    Return: void
+ ******************************************************************************/
+
+/******************************************************************************
+ *  void setCheckNum(QString checkNum);
+ *
+ *    Mutator; This method will update the _checkNum attribute to the
+ *      parameter checkNum value
+ * ----------------------------------------------------------------------------
+ *    Parameters: QString
  * ----------------------------------------------------------------------------
  *    Return: void
  ******************************************************************************/

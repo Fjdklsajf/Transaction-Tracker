@@ -174,11 +174,13 @@ void LoginWindow::saveToFiles(const Tracker& tracker, QString path) {
             QString description = t.getDescription();
             description.replace("\n", "\\\\n");
             description += "\n";
+            QString checkNum = t.getCheckNum() + "\n";
 
             file.write(date.toUtf8());
             file.write(timestamp.toUtf8());
             file.write(amount.toUtf8());
             file.write(description.toUtf8());
+            file.write(checkNum.toUtf8());
         }
         file.close();
     }
@@ -221,11 +223,15 @@ void LoginWindow::on_login_pushButton_clicked() {
         } else {
             // incorrect password
             QMessageBox::critical(this, "Error", "Incorrect password");
+            ui->password_lineEdit->selectAll();
             return;
         }
     } else {
         // user not found
         QMessageBox::critical(this, "Error", "Username not found");
+        ui->password_lineEdit->clear();
+        ui->username_lineEdit->setFocus();
+        ui->username_lineEdit->selectAll();
         return;
     }
 

@@ -180,7 +180,7 @@ std::vector<Transaction> Tracker::getAllTransactions() {
 
 /******************************************************************************
  *
- *  Accessor getAllTransactions: Class Tracker
+ *  Accessor getTransDateSorted: Class Tracker
  *_____________________________________________________________________________
  *  This method will return all Transactions combined in all Categories
  *      sorted by dates
@@ -206,7 +206,7 @@ std::vector<Transaction> Tracker::getTransDateSorted() {
 
 /******************************************************************************
  *
- *  Accessor getAllTransactions: Class Tracker
+ *  Accessor getTransAmountSorted: Class Tracker
  *_____________________________________________________________________________
  *  This method will return all Transactions combined in all Categories
  *      sorted by amounts
@@ -219,15 +219,43 @@ std::vector<Transaction> Tracker::getTransDateSorted() {
  *    a list of all Transactions sorted by amounts is returned
  ******************************************************************************/
 std::vector<Transaction> Tracker::getTransAmountSorted() {
-    if(_categories.size() <= 1) {
-        return getAllTransactions();
-    }
-
     // sort the list of all transactions by cost
     std::vector<Transaction> sorted = getAllTransactions();
     std::sort(sorted.begin(), sorted.end(),
               [] (const Transaction& t1, const Transaction& t2) -> bool {
         return t1.getCost() > t2.getCost();
+    });
+
+    return sorted;
+}
+
+/******************************************************************************
+ *
+ *  Accessor getTransCheckNumSorted: Class Tracker
+ *_____________________________________________________________________________
+ *  This method will return all Transactions sorted by check number
+ *  - returns std::vector<Transasction>
+ *_____________________________________________________________________________
+ *  PRE-CONDITIONS
+ *    none
+ *
+ *  POST-CONDITIONS
+ *    a list of all Transactions sorted by check number is returned
+ ******************************************************************************/
+std::vector<Transaction> Tracker::getTransCheckNumSorted(QString category) {
+    std::vector<Transaction> sorted;
+    if(category == "") {
+        sorted = getAllTransactions();
+    } else if (exist(category)) {
+        sorted = getTransDate(category);
+    } else {
+        return sorted;
+    }
+
+    // sort the list of all transactions by cost
+    std::sort(sorted.begin(), sorted.end(),
+              [] (const Transaction& t1, const Transaction& t2) -> bool {
+        return t1.getCheckNum() < t2.getCheckNum();
     });
 
     return sorted;
@@ -396,8 +424,10 @@ void Tracker::addTransaction(QString category, const Transaction& t) {
  *    A Transaction is added
  ******************************************************************************/
 void Tracker::addTransaction(QString category, double cost, QString description,
-                             const QDate& date, const QDateTime& time) {
-    addTransaction(category, Transaction(cost, description, date, time, category));
+                             const QDate& date, QString checkNum,
+                             const QDateTime& time) {
+    addTransaction(category, Transaction(cost, description, date, time,
+                                         category, checkNum));
 }
 
 /******************************************************************************

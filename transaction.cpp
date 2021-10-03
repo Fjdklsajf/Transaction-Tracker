@@ -16,7 +16,7 @@
  *    _cost = 0, _description = "", _date = current date,
  *    _timestamp = current date time, _category = ""
  ******************************************************************************/
-Transaction::Transaction() : Transaction(0, "") {
+Transaction::Transaction() : Transaction(0) {
 }
 
 /******************************************************************************
@@ -33,9 +33,9 @@ Transaction::Transaction() : Transaction(0, "") {
  *    _cost, _description, _date, _timestamp, _category are initialized
  ******************************************************************************/
 Transaction::Transaction(double cost, QString descrip, const QDate& date,
-                         const QDateTime& time, QString category) :
+                         const QDateTime& time, QString category, QString checkNum) :
     _cost(cost), _description(descrip), _date(date),
-    _timestamp(time), _category(category) {
+    _timestamp(time), _category(category), _checkNum(checkNum) {
 }
 
 /******************************************************************************
@@ -121,6 +121,23 @@ const QDate& Transaction::getDate() const {
  ******************************************************************************/
 const QDateTime& Transaction::getTimestamp() const {
     return _timestamp;
+}
+
+/******************************************************************************
+ *
+ *  Accessor getCheckNum: Class Transaction
+ *_____________________________________________________________________________
+ *  This method will return the check number
+ *  - returns const QDateTime&
+ *_____________________________________________________________________________
+ *  PRE-CONDITIONS
+ *    none
+ *
+ *  POST-CONDITIONS
+ *    _checkNum is returned
+ ******************************************************************************/
+QString Transaction::getCheckNum() const {
+    return _checkNum;
 }
 
 /******************************************************************************
@@ -250,6 +267,24 @@ void Transaction::setTimestamp(int y, int M, int d, int h, int m, int s, int ms)
 
 /******************************************************************************
  *
+ *  Mutator setCheckNum: Class Transaction
+ *_____________________________________________________________________________
+ *  This method will update the _checkNum attribute with the given parameter
+ *      checkNum value
+ *  - returns void
+ *_____________________________________________________________________________
+ *  PRE-CONDITIONS
+ *    none
+ *
+ *  POST-CONDITIONS
+ *    _checkNum is updated
+ ******************************************************************************/
+void Transaction::setCheckNum(QString checkNum) {
+    _checkNum = checkNum;
+}
+
+/******************************************************************************
+ *
  *  Method costText: Class Transaction
  *_____________________________________________________________________________
  *  Return a formatted QString _cost in the form of
@@ -327,6 +362,7 @@ QString Transaction::timestampText() const {
  *  Return the Transaction in a QString in the form of
  *      Category
  *      January 01, 2000 -- $10.50
+ *      Check #:
  *
  *      Description
  *      Description
@@ -339,8 +375,12 @@ QString Transaction::timestampText() const {
  *    transaction is returned as a formatted QString
  ******************************************************************************/
 QString Transaction::toString() const {
-    return _category + "\n" + dateFullText() + " -- " + costText() + "\n\n" +
-           _description;
+    QString descrip = _category + "\n" + dateFullText() + " -- " + costText() + "\n";
+    if(_checkNum != "") {
+        descrip += "Check #: " + _checkNum + "\n";
+    }
+    descrip += "\n" + _description;
+    return descrip;
 }
 
 /******************************************************************************
@@ -374,8 +414,9 @@ bool Transaction::contains(QString keyword) const {
  *    returns true if the transactions are equal
  ******************************************************************************/
 bool Transaction::operator ==(const Transaction& t) const {
-    return (_cost == t.getCost() && _description == t.getDescription()
-            && _date == t.getDate() && _timestamp == t.getTimestamp());
+    return (_cost == t.getCost() && _description == t.getDescription() &&
+            _date == t.getDate() && _timestamp == t.getTimestamp() &&
+            _checkNum == t._checkNum);
 }
 
 /******************************************************************************

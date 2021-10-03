@@ -33,6 +33,7 @@ class Category {
     void add(const Transaction& t);
     void add(double cost, QString description = "",
              const QDate& date = QDate::currentDate(),
+             QString checkNum = "",
              const QDateTime& time = QDateTime::currentDateTime());
     void remove(const Transaction& t);
     void clear();
@@ -195,13 +196,13 @@ class Category {
 
 /******************************************************************************
  *  void add(double cost, QString description = "",
-             const QDate& date = QDate::currentDate(),
+             const QDate& date = QDate::currentDate(), QString checkNum = "",
              const QDateTime& time = QDateTime::currentDateTime());
  *
  *    Mutator; This method will add a transactions in this category with the
  *      given parameter values
  * ----------------------------------------------------------------------------
- *    Parameters: double, QString, const QDate&, const QDateTime&
+ *    Parameters: double, QString, const QDate&, QString, const QDateTime&
  * ----------------------------------------------------------------------------
  *    Return: void
  ******************************************************************************/
